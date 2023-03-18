@@ -41,16 +41,16 @@ class astar_planner:
         Status = False
 
         #iterate through all possible actions
-        for action in self.env.Actions:
+        for action in self.action_handler.Actions:
             #make a copy of the current agents position
 
             #Compute agents possible furture position
-            Status ,Sim_Pose = self.action_handler.ActionHandlers[action](parent_node)
+            Status ,Sim_Pose = self.action_handler.PerformAction(parent_node, action)
 
             #If the future position is in the bounds of the environemnt
             if Status:
                 
-                simulated_position , Total_Cost_To_Come = Sim_Pose
+                simulated_position , Total_Cost_To_Come, Total_Cost_To_Go = Sim_Pose
 
                 #else of the state has already been explored then ignore the action
                 if simulated_position in self.visited_node_list:
@@ -60,7 +60,7 @@ class astar_planner:
                 #if state has been visited for the first time then create anew node for the state
                 if simulated_position not in node_manager.global_node_directory:
                     #Create a new node
-                    NewNode = node_manager.make_node(simulated_position, Total_Cost_To_Come)
+                    NewNode = node_manager.make_node(simulated_position, Total_Cost_To_Come, Total_Cost_To_Go)
                     #Update the parent for the node
                     NewNode.Parent_Node_hash = parent_node.Node_hash
                 
@@ -69,9 +69,9 @@ class astar_planner:
                 # and update its cost and parent if necessary
                 else:
                     #If node can be reached in less cost
-                    if node_manager.global_node_directory[simulated_position].Cost_to_Come > Total_Cost_To_Come:
+                    if node_manager.global_node_directory[simulated_position].Total_Cost > Total_Cost_To_Come+Total_Cost_To_Go:
                         #update cost
-                        node_manager.global_node_directory[simulated_position].Cost_to_Come = Total_Cost_To_Come
+                        node_manager.global_node_directory[simulated_position].Total_Cost = Total_Cost_To_Come+Total_Cost_To_Go
                         #update new parent node
                         node_manager.global_node_directory[simulated_position].Parent_Node_hash = parent_node.Node_hash
                         NewNode = node_manager.global_node_directory[simulated_position]

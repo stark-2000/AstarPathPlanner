@@ -120,14 +120,6 @@ class environment:
         self.map[i, j] = [255, 255, 255]
         self.refresh_map()
 
-    def update_batch_map(self, explored_nodes):
-        """Update map with explored nodes colour
-
-        Args:
-            explored_node (tuple): state that has been visited
-        """
-        self.map[explored_nodes] =[255, 255, 255]
-        self.refresh_map()
 
     def save_image(self, file_path):
         """saves current state of the environment in the file location as image 
