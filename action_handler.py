@@ -23,10 +23,10 @@ class action_handler:
         x, y, theta = pose
 
         theta_new = (theta + action) % 360
-        theta_new_rad = theta_new*math.pi/180
+        theta_new_rad = (theta_new)*math.pi/180
 
-        x_new = x + self.step_size * math.cos( action+theta_new_rad ) 
-        y_new = y + self.step_size * math.sin( action+theta_new_rad )
+        x_new = x + self.step_size * math.cos( theta_new_rad ) 
+        y_new = y + self.step_size * math.sin( theta_new_rad )
 
         return (round(x_new), round(y_new), theta_new) 
     
@@ -54,7 +54,7 @@ class action_handler:
         #Compute the total cost of the action
         action_cost_to_come = parent_node.Cost_to_Come + self.cost_norm(agents_pose, simulated_position)
 
-        action_cost_to_go = parent_node.Cost_to_Come + self.cost_norm(simulated_position, self.goal_pose)
+        action_cost_to_go =  self.cost_norm(simulated_position, self.goal_pose)+abs(agents_pose[2] - simulated_position[2])
 
         #Check if the computed position os valid
         if not self.env.is_valid_position(simulated_position):

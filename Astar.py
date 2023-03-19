@@ -22,7 +22,6 @@ class astar_planner:
     def goal_check(self, node, list_x, list_y, list_theta):
         #Eucledian distance threshold = 0.5
         #Theta threshold = 30
-   
         dist_matrix = np.sqrt((list_y - node[1])**2 + (list_x - node[0])**2) #dist formula = ((y2 - y1)^2 + (x2 - x1)^2)^1/2
         dist_matrix = dist_matrix.reshape(len(list_y), 1) #reshape to (n,1)
 
@@ -32,12 +31,12 @@ class astar_planner:
         theta_threshold_max = node[2] + self.goal_theta_threshold #theta threshold max = node's theta +30
 
         if len(_x) > 0: #if there are elements in dist_matrix that are less than 0.5
-            for i in _x: #loop through all elements in dist_matrix that are less than 0.5
-                if list_theta[i[0]] > theta_threshold_min and list_theta[i[0]] < theta_threshold_max: #if theta of node in list is within theta threshold
-                    return True
-                
-                else:
-                    return False #Else node is not in the given list
+            # for i in _x: #loop through all elements in dist_matrix that are less than 0.5
+            #     if list_theta[i[0]] > theta_threshold_min and list_theta[i[0]] < theta_threshold_max: #if theta of node in list is within theta threshold
+            #         return True
+            #     else:
+            #         return False #Else node is not in the given list
+            return True
         else:
              return False #Else node is not in the given list
 
@@ -48,16 +47,25 @@ class astar_planner:
         dist_matrix = np.sqrt((list_y - node[1])**2 + (list_x - node[0])**2) #dist formula = ((y2 - y1)^2 + (x2 - x1)^2)^1/2
         dist_matrix = dist_matrix.reshape(len(list_y), 1) #reshape to (n,1)
 
-        _x = np.argwhere(dist_matrix < 2.5) #get index of all elements in dist_matrix that are less than 0.5
+        _x = np.argwhere(dist_matrix < 2.5).ravel() #get index of all elements in dist_matrix that are less than 0.5
         
-        theta_threshold_min = node[2] - 30 #theta threshold min = node's theta -30
-        theta_threshold_max = node[2] + 30 #theta threshold max = node's theta +30
+        theta_threshold_min = node[2] - 10 #theta threshold min = node's theta -30
+        theta_threshold_max = node[2] + 10 #theta threshold max = node's theta +30
+
+        # if _x.size > 0:
+        #     thetas = list_theta[_x.ravel()]
+
+        #     range_thetas = np.where(np.logical_and(thetas>=theta_threshold_min, thetas<=theta_threshold_max))
+            
+        #     _len = len(range_thetas[0])
+        #     if _len > 0:
+        #         return True, _x[range_thetas[0][0]]
 
         if len(_x) > 0: #if there are elements in dist_matrix that are less than 0.5
             for i in _x: #loop through all elements in dist_matrix that are less than 0.5
-                if list_theta[i[0]] > theta_threshold_min and list_theta[i[0]] < theta_threshold_max: #if theta of node in list is within theta threshold
-                    return True, i[0] #Then node is in the given list
-                
+                if list_theta[i] > theta_threshold_min and list_theta[i] < theta_threshold_max: #if theta of node in list is within theta threshold
+                    return True, i #Then node is in the given list
+            # return True, _x[0][0]
             return False, None #Else node is not in the given list
         else:
              return False, None #Else node is not in the given list
@@ -79,6 +87,7 @@ class astar_planner:
 
         #move the input node into explored list
         self.visited_node_list.append(parent_node.Node_hash)
+        self.node_arrow_list[parent_node.Node_hash] = []
 
         Sim_Pose = None
         Status = False
@@ -109,13 +118,15 @@ class astar_planner:
                     NewNode = node_manager.make_node(simulated_position, Total_Cost_To_Come, Total_Cost_To_Go)
                     #Update the parent for the node
                     NewNode.Parent_Node_hash = parent_node.Node_hash
+                    heapq.heappush(self.pending_state_que, NewNode)
+                    self.node_arrow_list[parent_node.Node_hash].append(NewNode.Node_hash)
                 
                 
                 #else if the state is in pending que then verify its current cost
                 # and update its cost and parent if necessary
                 else:
                     #If node can be reached in less cost
-                    if node_manager.global_node_directory[idx].Total_Cost > Total_Cost_To_Come+Total_Cost_To_Go:
+                    if node_manager.global_node_directory[idx].Total_Cost > Total_Cost_To_Come + Total_Cost_To_Go:
                         #update cost
                         node_manager.global_node_directory[idx].cost_to_come = Total_Cost_To_Come
                         node_manager.global_node_directory[idx].cost_to_go = Total_Cost_To_Go
@@ -123,12 +134,14 @@ class astar_planner:
                         #update new parent node
                         node_manager.global_node_directory[idx].Parent_Node_hash = parent_node.Node_hash
                         node_manager.global_node_directory[idx].Node_State = simulated_position
+
                         NewNode = node_manager.global_node_directory[idx]
+                        heapq.heapify(self.pending_state_que)
 
                 #Push new node to the pending que for future expoloration
-                if NewNode != None:
-                    #Found an unique state that needs to be pushed in to the que
-                    heapq.heappush(self.pending_state_que, NewNode)
+                # if NewNode != None:
+                #     #Found an unique state that needs to be pushed in to the que
+                #     heapq.heappush(self.pending_state_que, NewNode)
 
     
     def find_goal_node(self, start_state, goal_state, goal_dist_threshold, goal_theta_threshold) -> bool:
@@ -156,6 +169,7 @@ class astar_planner:
         heapq.heapify(self.pending_state_que)
 
         self.visited_node_list = []
+        self.node_arrow_list = {}
 
         #Perform search till a goal state is reached or maximum number of iterations reached
         
@@ -169,7 +183,7 @@ class astar_planner:
                 
             if next_item!= None:
                 next_node = next_item
-                print(next_node.Node_State)
+                # print(next_node.Node_State)
                 #Check if the next node is the goal node, then return success
                 if self.goal_check(next_node.Node_State, np.array([goal_state[0]]), np.array([goal_state[1]]), np.array([goal_state[2]])):
                     self.Final_Node = next_node
@@ -225,18 +239,18 @@ class astar_planner:
         #variable to control gui update rate
         update_count = 0
         # Loop through all visited nodes and show on the cv window
-        for position in self.visited_node_list:
-            self.env.update_map(node_manager.global_node_directory[position].Node_State)
-            self.env.highlight_state(self.initial_state)
-            self.env.highlight_state(self.goal_state)
-            _environment.refresh_map()
-
-            update_count +=1
-            #Update gui every 300 iteration
-            if update_count == 500:
-                update_count = 0
-                _environment.write_video_frame()
-                cv.waitKey(1)
+        for start in self.node_arrow_list:
+            for end in self.node_arrow_list[start]:
+                self.env.update_action(node_manager.global_node_directory[start].Node_State, \
+                                       node_manager.global_node_directory[end].Node_State)
+                # _environment.refresh_map()
+                
+                update_count +=1
+                #Update gui every 300 iteration
+                if update_count == 500:
+                    update_count = 0
+                    _environment.write_video_frame()
+                    cv.waitKey(1)
 
 
 
@@ -269,8 +283,8 @@ if __name__ == "__main__":
         # goal_state  = (int(str_goal_pos[1]), int(str_goal_pos[0]))
 
         start_state = (30, 30, 30)
-        goal_state = (120, 120, 30)
-        step_size = 1
+        goal_state = (120, 418, 30)
+        step_size = 5
         goal_dist_threshold = 7.5
         goal_theta_threshold = 30
         robot_radius = 5

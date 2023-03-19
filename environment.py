@@ -93,11 +93,12 @@ class environment:
         Returns:
             bool: True if pixel belongs to free space else False
         """
-        #Check if a state belongs to free psace by comparing the color of the respective pixel in the environment
-        if  self.map[position[0], position[1]][0] == 0xc2 and \
-            self.map[position[0], position[1]][1] == 0xba and \
-            self.map[position[0], position[1]][2] == 0xa3:
-            return True
+        if position[0] >=0 and position[0] < 250 and position[1] >=0 and position[1] < 600:
+            #Check if a state belongs to free psace by comparing the color of the respective pixel in the environment
+            if  self.map[position[0], position[1]][0] == 0xc2 and \
+                self.map[position[0], position[1]][1] == 0xba and \
+                self.map[position[0], position[1]][2] == 0xa3:
+                return True
         
         #return false of state is in obstacle space
         return False
@@ -110,14 +111,25 @@ class environment:
         image = cv.flip(self.map.astype('uint8'), 0)
         cv.imshow("map", image)
 
-    def update_map(self, explored_node):
+    def update_map(self, position):
+        """Highlights a point in the environment at the given locaiton
+
+        Args:
+            position (tuple): pixel location
+        """
+        i, j, _ = position
+        self.map[i, j] = [255, 255, 255]
+        self.refresh_map()
+
+    def update_action(self, start, end):
         """Update map with explored nodes colour
 
         Args:
             explored_node (tuple): state that has been visited
         """
-        i, j, theta = explored_node
-        self.map[i, j] = [255, 255, 255]
+        x1, y1, theta1 = start
+        x2, y2, theta2 = end
+        cv.arrowedLine(self.map, (y1, x1), (y2, x2),[0, 255, 255], 1, cv.LINE_AA)
         self.refresh_map()
 
 
@@ -146,7 +158,7 @@ class environment:
         Args:
             position (tuple): pixel location
         """
-        i, j = position
+        i, j, _ = position
         self.map[i, j] = [255, 0, 0]
 
 
