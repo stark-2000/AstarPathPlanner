@@ -1,6 +1,6 @@
 
 from node import *
-
+import numpy as np
 
 class node_manager:
 #Class to mange all the node creation and maintainance
@@ -8,9 +8,9 @@ class node_manager:
     #A global node directory where all the nodes that has been creates will be stored
     global_node_directory = {}
 
-    node_x = []
-    node_y = []
-    node_theta = []
+    node_x = None
+    node_y = None
+    node_theta = None
 
 
     #call this funciton before starting the search to reset id
@@ -21,10 +21,16 @@ class node_manager:
     #Funciton to create a hash map for a given state of the node
     def make_hash(state):
         #For the current use case we can just use the lcoation of the pixel as hash
-        node_manager.node_x.append(state[0])
-        node_manager.node_y.append(state[1])
-        node_manager.node_theta.append(state[2])
-        return len(node_manager) - 1
+        if node_manager.node_x is None:
+            node_manager.node_x = np.array([state[0]])
+            node_manager.node_y = np.array([state[1]])
+            node_manager.node_theta = np.array([state[2]])
+        else:   
+            node_manager.node_x = np.append(node_manager.node_x, state[0])
+            node_manager.node_y = np.append(node_manager.node_y, state[1])
+            node_manager.node_theta = np.append(node_manager.node_theta, state[2])
+
+        return len(node_manager.node_x) - 1
 
 
     def make_node(state, cost_to_come = 0, cost_to_go = 0):

@@ -22,7 +22,7 @@ class action_handler:
     def ActionValues(self, action,  pose):
         x, y, theta = pose
 
-        theta_new = theta + pose
+        theta_new = (theta + action) % 360
         theta_new_rad = theta_new*math.pi/180
 
         x_new = x + self.step_size * math.cos( action+theta_new_rad ) 
@@ -33,7 +33,7 @@ class action_handler:
     def cost_norm(self, pose1, pose2):
         x1, y1, theta1 = pose1
         x2, y2, theta2 = pose2
-        np.linalg.norm([x1 - x2, y1 - y2])
+        return np.linalg.norm([x1 - x2, y1 - y2])
 
     def PerformAction(self, parent_node, action):
         """Compute the next state and estimate the total cost for the next state

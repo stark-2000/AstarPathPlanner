@@ -18,6 +18,49 @@ class astar_planner:
     def __init__(self, env, action_handler) -> None:
         self.env = env
         self.action_handler = action_handler
+
+    def goal_check(self, node, list_x, list_y, list_theta):
+        #Eucledian distance threshold = 0.5
+        #Theta threshold = 30
+   
+        dist_matrix = np.sqrt((list_y - node[1])**2 + (list_x - node[0])**2) #dist formula = ((y2 - y1)^2 + (x2 - x1)^2)^1/2
+        dist_matrix = dist_matrix.reshape(len(list_y), 1) #reshape to (n,1)
+
+        _x = np.argwhere(dist_matrix < self.goal_dist_threshold) #get index of all elements in dist_matrix that are less than 0.5
+        
+        theta_threshold_min = node[2] - self.goal_theta_threshold #theta threshold min = node's theta -30
+        theta_threshold_max = node[2] + self.goal_theta_threshold #theta threshold max = node's theta +30
+
+        if len(_x) > 0: #if there are elements in dist_matrix that are less than 0.5
+            for i in _x: #loop through all elements in dist_matrix that are less than 0.5
+                if list_theta[i[0]] > theta_threshold_min and list_theta[i[0]] < theta_threshold_max: #if theta of node in list is within theta threshold
+                    return True
+                
+                else:
+                    return False #Else node is not in the given list
+        else:
+             return False #Else node is not in the given list
+
+    def visited_node_check(self, node, list_x, list_y, list_theta):
+        #Eucledian distance threshold = 0.5
+        #Theta threshold = 30
+   
+        dist_matrix = np.sqrt((list_y - node[1])**2 + (list_x - node[0])**2) #dist formula = ((y2 - y1)^2 + (x2 - x1)^2)^1/2
+        dist_matrix = dist_matrix.reshape(len(list_y), 1) #reshape to (n,1)
+
+        _x = np.argwhere(dist_matrix < 2.5) #get index of all elements in dist_matrix that are less than 0.5
+        
+        theta_threshold_min = node[2] - 30 #theta threshold min = node's theta -30
+        theta_threshold_max = node[2] + 30 #theta threshold max = node's theta +30
+
+        if len(_x) > 0: #if there are elements in dist_matrix that are less than 0.5
+            for i in _x: #loop through all elements in dist_matrix that are less than 0.5
+                if list_theta[i[0]] > theta_threshold_min and list_theta[i[0]] < theta_threshold_max: #if theta of node in list is within theta threshold
+                    return True, i[0] #Then node is in the given list
+                
+            return False, None #Else node is not in the given list
+        else:
+             return False, None #Else node is not in the given list
         
     def explore_actions(self, parent_node) -> bool:
         """Function takes an environmet state and runs 
@@ -35,7 +78,7 @@ class astar_planner:
         agents_postion = parent_node.Node_State
 
         #move the input node into explored list
-        self.visited_node_list[agents_postion] = None
+        self.visited_node_list.append(parent_node.Node_hash)
 
         Sim_Pose = None
         Status = False
@@ -53,28 +96,34 @@ class astar_planner:
                 simulated_position , Total_Cost_To_Come, Total_Cost_To_Go = Sim_Pose
 
                 #else of the state has already been explored then ignore the action
-                if simulated_position in self.visited_node_list:
+                status, idx = self.visited_node_check(simulated_position, node_manager.node_x[self.visited_node_list], \
+                                            node_manager.node_y[self.visited_node_list], node_manager.node_theta[self.visited_node_list])
+                if status:
                     continue
                 
                 NewNode = None
                 #if state has been visited for the first time then create anew node for the state
-                if simulated_position not in node_manager.global_node_directory:
+                status, idx =  self.visited_node_check(simulated_position, node_manager.node_x, node_manager.node_y, node_manager.node_theta)
+                if not status:
                     #Create a new node
                     NewNode = node_manager.make_node(simulated_position, Total_Cost_To_Come, Total_Cost_To_Go)
                     #Update the parent for the node
                     NewNode.Parent_Node_hash = parent_node.Node_hash
                 
                 
-                #else if the state is in pending que then verify its current cost 
+                #else if the state is in pending que then verify its current cost
                 # and update its cost and parent if necessary
                 else:
                     #If node can be reached in less cost
-                    if node_manager.global_node_directory[simulated_position].Total_Cost > Total_Cost_To_Come+Total_Cost_To_Go:
+                    if node_manager.global_node_directory[idx].Total_Cost > Total_Cost_To_Come+Total_Cost_To_Go:
                         #update cost
-                        node_manager.global_node_directory[simulated_position].Total_Cost = Total_Cost_To_Come+Total_Cost_To_Go
+                        node_manager.global_node_directory[idx].cost_to_come = Total_Cost_To_Come
+                        node_manager.global_node_directory[idx].cost_to_go = Total_Cost_To_Go
+                        node_manager.global_node_directory[idx].Total_Cost = Total_Cost_To_Come + Total_Cost_To_Go
                         #update new parent node
-                        node_manager.global_node_directory[simulated_position].Parent_Node_hash = parent_node.Node_hash
-                        NewNode = node_manager.global_node_directory[simulated_position]
+                        node_manager.global_node_directory[idx].Parent_Node_hash = parent_node.Node_hash
+                        node_manager.global_node_directory[idx].Node_State = simulated_position
+                        NewNode = node_manager.global_node_directory[idx]
 
                 #Push new node to the pending que for future expoloration
                 if NewNode != None:
@@ -82,7 +131,7 @@ class astar_planner:
                     heapq.heappush(self.pending_state_que, NewNode)
 
     
-    def find_goal_node(self, start_state, goal_state) -> bool:
+    def find_goal_node(self, start_state, goal_state, goal_dist_threshold, goal_theta_threshold) -> bool:
         """Takes start stat and goal state for the environement 
         and computes the tree using _Breadth first search algorithm till the goal state is reached 
 
@@ -97,6 +146,8 @@ class astar_planner:
         #initailize states
         self.goal_state = goal_state
         self.initial_state = start_state
+        self.goal_dist_threshold = goal_dist_threshold
+        self.goal_theta_threshold = goal_theta_threshold
         self.Final_Node = None
 
         #Initialize search que. This stores the nodes that needs to be explored
@@ -104,7 +155,7 @@ class astar_planner:
         self.pending_state_que = [start_node]
         heapq.heapify(self.pending_state_que)
 
-        self.visited_node_list = {}
+        self.visited_node_list = []
 
         #Perform search till a goal state is reached or maximum number of iterations reached
         
@@ -115,21 +166,26 @@ class astar_planner:
             else:
                 next_item = None
                 
+                
             if next_item!= None:
                 next_node = next_item
-
+                print(next_node.Node_State)
                 #Check if the next node is the goal node, then return success
-                if next_node.Node_State == self.goal_state:
+                if self.goal_check(next_node.Node_State, np.array([goal_state[0]]), np.array([goal_state[1]]), np.array([goal_state[2]])):
                     self.Final_Node = next_node
                     print("Found the goal state!!!")
                     return True
 
                 #Check if the next node has already been visited then ignore the node
-                if next_node.Node_State in self.visited_node_list:
-                    continue
-                ##lse explore the node
-                else:
-                    self.explore_actions(next_node)
+                # if next_node.Node_State in self.visited_node_list:
+                #     continue
+                # ##lse explore the node
+                # else:
+                self.explore_actions(next_node)
+                # self.env.update_map(next_node.Node_State)
+                # self.env.highlight_state(self.initial_state)
+                # self.env.highlight_state(self.goal_state)
+                # self.env.refresh_map()
             else:
                 print("Unable to find the goal state!!!")
                 return False
@@ -170,7 +226,7 @@ class astar_planner:
         update_count = 0
         # Loop through all visited nodes and show on the cv window
         for position in self.visited_node_list:
-            self.env.update_map(position)
+            self.env.update_map(node_manager.global_node_directory[position].Node_State)
             self.env.highlight_state(self.initial_state)
             self.env.highlight_state(self.goal_state)
             _environment.refresh_map()
@@ -203,7 +259,8 @@ class astar_planner:
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 3:
+    # if len(sys.argv) == 3:
+    if True:
 
         # str_start_pos = sys.argv[1].replace("[", "").replace("]", "").replace(" ", "").split(",")
         # str_goal_pos = sys.argv[2].replace("[", "").replace("]", "").replace(" ", "").split(",")
@@ -212,11 +269,16 @@ if __name__ == "__main__":
         # goal_state  = (int(str_goal_pos[1]), int(str_goal_pos[0]))
 
         start_state = (30, 30, 30)
-        goal_state = (40, 40, 30)
+        goal_state = (120, 120, 30)
+        step_size = 1
+        goal_dist_threshold = 7.5
+        goal_theta_threshold = 30
+        robot_radius = 5
+        obstacle_infaltion = 5
 
         #Create environment
         print("Please wait while creating the environment.")
-        _environment = environment(250, 600)
+        _environment = environment(250, 600, robot_radius+obstacle_infaltion)
         _environment.create_map()
         print("Environment created successfully.")
 
@@ -233,7 +295,7 @@ if __name__ == "__main__":
         
         if good_states:
             #Create action handler for the environment
-            _actionHandler = action_handler(_environment)
+            _actionHandler = action_handler(_environment, step_size, start_state, goal_state)
 
             #create planner
             _astar_planner = astar_planner(_environment, _actionHandler)
@@ -243,7 +305,7 @@ if __name__ == "__main__":
             print(f"Start Psotion : {[start_state[1], start_state[0]]}, Goal Postion : {[goal_state[1], goal_state[0]]}")
             print("Please wait while searching for the goal state...")
             start_time = time.time()
-            _status =  _astar_planner.find_goal_node(start_state, goal_state)
+            _status =  _astar_planner.find_goal_node(start_state, goal_state, goal_dist_threshold, goal_theta_threshold)
             elspsed_time = time.time() - start_time
 
             print(f"Total time taken to run the algorithm : {elspsed_time} seconds\n")

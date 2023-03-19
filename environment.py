@@ -116,7 +116,7 @@ class environment:
         Args:
             explored_node (tuple): state that has been visited
         """
-        i, j = explored_node
+        i, j, theta = explored_node
         self.map[i, j] = [255, 255, 255]
         self.refresh_map()
 
