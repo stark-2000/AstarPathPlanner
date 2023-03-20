@@ -5,9 +5,8 @@ class node:
 
     def __init__(self, state, hash, cost_to_come, cost_to_go) -> None:
         """Constructor for node object
-
         Args:
-            state (numpy array): state of the environemtn
+            state (numpy array): state of the environemnt
         """
 
         # an unique id is generated for the given state by taking the 

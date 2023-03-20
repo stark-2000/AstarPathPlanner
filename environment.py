@@ -109,6 +109,7 @@ class environment:
         """
         #Flip the map to satisfy the environment direction
         image = cv.flip(self.map.astype('uint8'), 0)
+        image = cv.resize(image, (0,0), fx = 2, fy = 2)
         cv.imshow("map", image)
 
     def update_map(self, position):
@@ -129,7 +130,7 @@ class environment:
         """
         x1, y1, theta1 = start
         x2, y2, theta2 = end
-        cv.arrowedLine(self.map, (y1, x1), (y2, x2),[0, 255, 255], 1, cv.LINE_AA)
+        self.map = cv.arrowedLine(self.map, (y1, x1), (y2, x2),[0, 255, 255], 1, cv.LINE_AA)
         self.refresh_map()
 
 
@@ -141,15 +142,16 @@ class environment:
         """
         #Flip the map to satisfy the environment direction
         image = cv.flip(self.map.astype('uint8'), 0)
+        image = cv.resize(image, (0,0), fx = 2, fy = 2)
         cv.imwrite(file_path, image)
 
-    def highlight_state(self, position):
+    def highlight_state(self, position, size, color):
         """Draws a circle at the given location in the environment
 
         Args:
             position (tuple): pixel location
         """
-        self.map =  cv.circle(self.map, (position[1],position[0]), 2, (255, 0, 0), 2)
+        self.map =  cv.circle(self.map, (position[1],position[0]), size, color, -1)
         self.refresh_map()
 
     def highlight_point(self, position):
@@ -161,13 +163,30 @@ class environment:
         i, j, _ = position
         self.map[i, j] = [255, 0, 0]
 
+    def show_robot(self, position, size):
+        """Highlights a point in the environment at the given locaiton
+
+        Args:
+            position (tuple): pixel location
+        """
+        _map = self.map.copy()
+        image =  cv.circle(_map, (position[1],position[0]), size, (255, 0, 0), -1)
+        image = cv.flip(image.astype('uint8'), 0)
+        resized = cv.resize(image, (0,0), fx = 2, fy = 2)
+        cv.imshow("map", resized)
+        return image
 
     #primitives to save video of the jplanning environment-----------------------
     def begin_video_writer(self):
          self.writer= cv.VideoWriter('Animation Video.mp4', cv.VideoWriter_fourcc(*'DIVX'), 10, (self.width, self.height))
     
+
+    def insert_video_frame(self, image):
+        self.writer.write(image)
+
     def write_video_frame(self):
         image = cv.flip(self.map.astype('uint8'), 0)
+        # image = cv.resize(image, (0,0), fx = 2, fy = 2)
         self.writer.write(image)
 
     def close_video_writer(self):
