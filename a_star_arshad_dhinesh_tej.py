@@ -31,14 +31,14 @@ class astar_planner:
         if len(_x) > 0: 
             return True
 
-    def visited_node_check(self, node, list_x, list_y, list_theta):
+    def visited_node_check(self, node, list_x, list_y, list_theta, robot_radius):
         #Eucledian distance threshold = 0.5
         #Theta threshold = 30
    
         dist_matrix = np.sqrt((list_y - node[1])**2 + (list_x - node[0])**2) #dist formula = ((y2 - y1)^2 + (x2 - x1)^2)^1/2
         dist_matrix = dist_matrix.reshape(len(list_y), 1) #reshape to (n,1)
 
-        _x = np.argwhere(dist_matrix < 2.5).ravel() #get index of all elements in dist_matrix that are less than 0.5
+        _x = np.argwhere(dist_matrix < 0.5*robot_radius).ravel() #get index of all elements in dist_matrix that are less than 0.5
         
         theta_threshold_min = node[2] - 10 #theta threshold min = node's theta -30
         theta_threshold_max = node[2] + 10 #theta threshold max = node's theta +30
@@ -97,13 +97,13 @@ class astar_planner:
 
                 #else of the state has already been explored then ignore the action
                 status, idx = self.visited_node_check(simulated_position, node_manager.node_x[self.visited_node_list], \
-                                            node_manager.node_y[self.visited_node_list], node_manager.node_theta[self.visited_node_list])
+                                            node_manager.node_y[self.visited_node_list], node_manager.node_theta[self.visited_node_list], self.robot_radius)
                 if status:
                     continue
                 
                 NewNode = None
                 #if state has been visited for the first time then create anew node for the state
-                status, idx =  self.visited_node_check(simulated_position, node_manager.node_x, node_manager.node_y, node_manager.node_theta)
+                status, idx =  self.visited_node_check(simulated_position, node_manager.node_x, node_manager.node_y, node_manager.node_theta, self.robot_radius)
                 if not status:
                     #Create a new node
                     NewNode = node_manager.make_node(simulated_position, Total_Cost_To_Come, Total_Cost_To_Go)
@@ -135,7 +135,7 @@ class astar_planner:
                 #     heapq.heappush(self.pending_state_que, NewNode)
 
     
-    def find_goal_node(self, start_state, goal_state, goal_dist_threshold) -> bool:
+    def find_goal_node(self, start_state, goal_state, robot_radius, goal_dist_threshold) -> bool:
         """Takes start stat and goal state for the environement 
         and computes the tree using _Breadth first search algorithm till the goal state is reached 
 
@@ -148,6 +148,7 @@ class astar_planner:
         node_manager.initialize()
 
         #initailize states
+        self.robot_radius = robot_radius
         self.goal_state = goal_state
         self.initial_state = start_state
         self.goal_dist_threshold = goal_dist_threshold
@@ -334,7 +335,7 @@ if __name__ == "__main__":
     print(f"Start Position : {[start_state[1], start_state[0]]}, Goal Postion : {[goal_state[1], goal_state[0]]}")
     print("Please wait while searching for the goal state...")
     start_time = time.time()
-    _status =  _astar_planner.find_goal_node(start_state, goal_state, goal_dist_threshold)
+    _status =  _astar_planner.find_goal_node(start_state, goal_state, robot_radius, goal_dist_threshold)
     elspsed_time = time.time() - start_time
 
     print(f"Total time taken to run the algorithm : {elspsed_time} seconds\n")
