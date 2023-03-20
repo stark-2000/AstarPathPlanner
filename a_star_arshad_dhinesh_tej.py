@@ -280,7 +280,7 @@ if __name__ == "__main__":
     robot_radius = int(input())
     goal_dist_threshold = 1.5 * robot_radius
     
-    print("Enter robot's actin step size: [1 - 10]") 
+    print("Enter robot's action step size: [1 - 10]") 
     step_size = int(input())
      
     while step_size < 1 or step_size > 10: #check if the start node is outside the map
