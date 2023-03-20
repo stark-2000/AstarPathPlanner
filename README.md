@@ -51,16 +51,13 @@
 
 
 ## Obstacle Space - Map:
-   - Adobe Photoshop generated:
-   <p align="center">
-https://user-images.githubusercontent.com/78305300/226238967-a6a45430-1abc-4328-8e67-80c05b55cd75.png
-   </p>
-    
-   - Desmos Visualization:
-   <p align="center">
-https://user-images.githubusercontent.com/78305300/226239006-b3ae5e74-8b31-467b-a268-965c7bd11103.png
-   </p>
-    
+- Adobe Photoshop generated:
+  
+  ![Canvas](https://user-images.githubusercontent.com/78305300/226239170-55cbf178-080e-4550-a2e5-8734c773b690.png)
+
+- Desmos Visualization:
+   
+![Canvas_Desmos](https://user-images.githubusercontent.com/78305300/226239180-21341f99-308c-4c84-a3f6-ec63ddbf447d.png)
 
 ## Demo Video:
  - Video shows exploration of nodes and finding the goal node for a circular robot given start node, goal node, robot radius and clerance from obstacles. Once the shortest path is found, it is backtracked and visualized using openCV.
