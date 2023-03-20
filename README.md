@@ -1,9 +1,9 @@
 # Implementation-of-A*-Path-Planning-Algorithm
 
 ## Team Members:
-    - Tej (119197066 - itej89)
-    - Arshad Shaik (118438832 - arshad22)
-    - Dhinesh Rajasekaran (119400241 - dhinesh)
+- Tej (119197066 - itej89)
+- Arshad Shaik (118438832 - arshad22)
+- Dhinesh Rajasekaran (119400241 - dhinesh)
 
 ## Google Drive Link:
 - Below link has the Animation Video output:
@@ -65,7 +65,7 @@
 ## Demo Video:
  - Video shows exploration of nodes and finding the goal node for a circular robot given start node, goal node, robot radius and clerance from obstacles. Once the shortest path is found, it is backtracked and visualized using openCV.
    
-https://user-images.githubusercontent.com/78305300/224716580-2c29afed-6261-4706-a8f3-ef806391cdf0.mp4
+https://user-images.githubusercontent.com/78305300/226238687-4ec5a996-c4e9-45fa-b35a-5d853e70b8a6.mp4
 
 
 ## Dependencies:
