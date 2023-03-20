@@ -10,7 +10,7 @@ from action_handler import *
 
 
 
-#Git repo link https://github.com/itej89/SimplePathPlanner
+#Git repo link https://github.com/itej89/AstarPathPlanner
 
  
 class astar_planner:
