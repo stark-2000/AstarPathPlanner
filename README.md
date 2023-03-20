@@ -53,12 +53,12 @@
 ## Obstacle Space - Map:
    - Adobe Photoshop generated:
    <p align="center">
-   ![My Image](readme_image/Canvas.png)
+   ![Canvas](https://user-images.githubusercontent.com/78305300/226238967-a6a45430-1abc-4328-8e67-80c05b55cd75.png)
    </p>
-
+    
    - Desmos Visualization:
    <p align="center">
-   ![My Image](readme_image/Canvas_Desmos.png)
+   ![Canvas_Desmos](https://user-images.githubusercontent.com/78305300/226239006-b3ae5e74-8b31-467b-a268-965c7bd11103.png)
    </p>
     
 
