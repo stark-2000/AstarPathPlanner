@@ -7,13 +7,17 @@ from obstacle_model import *
 class environment:
     """Class contains all the funcitonality to create and manipulate environemnt and its visualization
     """
-
     
     def inflate_polygon(self, vertices, radius):
-        pco = pyclipper.PyclipperOffset()
-        pco.AddPath(vertices, pyclipper.PT_CLIP, pyclipper.ET_CLOSEDPOLYGON)
-        vertices_inflated = pco.Execute(radius)
-        vertices_inflated = [tuple(x) for x in vertices_inflated[0]]
+        if(len(vertices) > 2):
+            pco = pyclipper.PyclipperOffset()
+            pco.AddPath(vertices, pyclipper.PT_CLIP, pyclipper.ET_CLOSEDPOLYGON)
+            vertices_inflated = pco.Execute(radius)
+            vertices_inflated = [tuple(x) for x in vertices_inflated[0]]
+        else:
+            vertices_inflated = vertices.copy()
+            vertices_inflated[1] += radius
+
         return vertices_inflated
 
     def __init__(self, height, width, inflation_radius) -> None:
@@ -26,9 +30,7 @@ class environment:
         self.width = width
         self.inflation_radius = inflation_radius
         #create a map fo given dimentions. 3 channels for opencv BGR
-        self.map = np.ones((height, width, 3))
-
-        
+        self.map = np.ones((height, width, 3))        
 
         #create obstacle models for all the objects in the environment
 
@@ -44,8 +46,9 @@ class environment:
         
         #create original polygon objects obstacle model
         self.original_obstacle_model = obstacle_model([  
-            [(150,200), (150,75), (165,75), (165,200), (150,200)],                        # Polygon corresponding to botom rectangular pillar
-            [(250,125), (250,0), (265,0), (265,125), (250,125)]                      # Polygon corresponding to Top rectangular pillar
+            [(150,200), (150,75), (165,75), (165,200), (150,200)], # Polygon corresponding to botom rectangular pillar
+            [(250,125), (250,0), (265,0), (265,125), (250,125)],
+            [(400,110), 50]                                        # Polygon corresponding to Top rectangular pillar
         ])      
 
 
@@ -53,9 +56,10 @@ class environment:
         self.inflated_obstacle_model = obstacle_model([
             self.inflate_polygon([(150,200), (150,75), (165,75), (165,200), (150,200)],  self.inflation_radius),
             self.inflate_polygon([(250,125), (250,0), (265,0), (265,125), (250,125)],  self.inflation_radius),
-        ])  
+            self.inflate_polygon([(250,125), (250,0), (265,0), (265,125), (250,125)],  self.inflation_radius),
+            self.inflate_polygon([(400,110), 50],  self.inflation_radius),
+        ])        
 
-        
     
     def create_map(self):
         """Idnetify obstacles and free space in the map uisng the obstacle models
@@ -78,6 +82,7 @@ class environment:
                 #Identify as state belongs to the free space
                 else:
                     self.map[i,j] = [0xc2, 0xba, 0xa3]
+
 
     def is_valid_position(self, position):
         """Checks if a given position belongs to free space or obstacle space
@@ -182,7 +187,7 @@ class environment:
     
 
 if __name__ == "__main__":
-    _map_viz = environment(200, 600, 10)
+    _map_viz = environment(200, 600, 5)
     _map_viz.create_map()
     _map_viz.refresh_map()
     cv.waitKey(0)
