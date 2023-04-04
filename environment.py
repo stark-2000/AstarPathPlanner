@@ -18,7 +18,6 @@ class environment:
 
     def __init__(self, height, width, inflation_radius) -> None:
         """Initialize environment parameters
-
         Args:
             height (int): height of the map
             width (int): width of the map
@@ -35,32 +34,28 @@ class environment:
 
         #create original boundary obstacle model
         self.boundary_model = obstacle_model([
-            [(600,0), (600,250), (0,250), (0,0)]
+            [(600,0), (600,200), (0,200), (0,0)]
             ])
         
         #create inflated boundary obstacle model
         self.inflated_boundary_model = obstacle_model([
-            self.inflate_polygon([(600,0), (600,250), (0,250), (0,0)],  -1*self.inflation_radius),
+            self.inflate_polygon([(600,0), (600,200), (0,200), (0,0)],  -1*self.inflation_radius),
             ])
         
         #create original polygon objects obstacle model
-        self.original_obstacle_model = obstacle_model([
-            [(150,0), (150,100), (100,100), (100,0)],                           # Polygon corresponding to botom rectangular pillar
-            [(150,150), (150,250), (100,250), (100,150)],                       # Polygon corresponding to Top rectangular pillar
-            [(360,87), (360,163), (300,200), (240,163), (240,87), (300,50)],    # Polygon corresponding to hexgon 
-            [(510,125), (460,225), (460,25) ],                                  # Polygon corresponding to Triangle 
+        self.original_obstacle_model = obstacle_model([  
+            [(150,200), (150,75), (165,75), (165,200), (150,200)],                        # Polygon corresponding to botom rectangular pillar
+            [(250,125), (250,0), (265,0), (265,125), (250,125)]                      # Polygon corresponding to Top rectangular pillar
         ])      
 
 
         #create inflated polygon objects obstacle model
         self.inflated_obstacle_model = obstacle_model([
-            self.inflate_polygon([(150,0), (150,100), (100,100), (100,0)],  self.inflation_radius),
-            self.inflate_polygon([(150,150), (150,250), (100,250), (100,150)],  self.inflation_radius),
-            self.inflate_polygon([(360,87), (360,163), (300,200), (240,163), (240,87), (300,50)],  self.inflation_radius),
-            self.inflate_polygon([(510,125), (460,225), (460,25) ],  self.inflation_radius),  
+            self.inflate_polygon([(150,200), (150,75), (165,75), (165,200), (150,200)],  self.inflation_radius),
+            self.inflate_polygon([(250,125), (250,0), (265,0), (265,125), (250,125)],  self.inflation_radius),
         ])  
 
-
+        
     
     def create_map(self):
         """Idnetify obstacles and free space in the map uisng the obstacle models
@@ -72,7 +67,7 @@ class environment:
                 if self.original_obstacle_model.is_inside_obstacle((j,i)):
                     self.map[i,j] = [0x80, 0x80, 0xff]
                 
-                #Checks if state present inside an nflated obstacle
+                #Checks if state present inside an inflated obstacle
                 elif self.inflated_obstacle_model.is_inside_obstacle((j,i)):
                     self.map[i,j] = [0x7a, 0x70, 0x52]
 
@@ -80,16 +75,14 @@ class environment:
                 elif not self.inflated_boundary_model.is_inside_obstacle((j,i)):
                     self.map[i,j] = [0x7a, 0x70, 0x52]
 
-                #Identify as stae belongs to the free space
+                #Identify as state belongs to the free space
                 else:
                     self.map[i,j] = [0xc2, 0xba, 0xa3]
 
     def is_valid_position(self, position):
         """Checks if a given position belongs to free space or obstacle space
-
         Args:
             position (tuple): state of the agent to be verified
-
         Returns:
             bool: True if pixel belongs to free space else False
         """
@@ -114,7 +107,6 @@ class environment:
 
     def update_map(self, position):
         """Highlights a point in the environment at the given locaiton
-
         Args:
             position (tuple): pixel location
         """
@@ -124,7 +116,6 @@ class environment:
 
     def update_action(self, start, end):
         """Update map with explored nodes colour
-
         Args:
             explored_node (tuple): state that has been visited
         """
@@ -136,7 +127,6 @@ class environment:
 
     def save_image(self, file_path):
         """saves current state of the environment in the file location as image 
-
         Args:
             file_path (string): absolute path of the file where the image needs to be saved
         """
@@ -147,7 +137,6 @@ class environment:
 
     def highlight_state(self, position, size, color):
         """Draws a circle at the given location in the environment
-
         Args:
             position (tuple): pixel location
         """
@@ -156,7 +145,6 @@ class environment:
 
     def highlight_point(self, position):
         """Highlights a point in the environment at the given locaiton
-
         Args:
             position (tuple): pixel location
         """
@@ -165,7 +153,6 @@ class environment:
 
     def show_robot(self, position, size):
         """Highlights a point in the environment at the given locaiton
-
         Args:
             position (tuple): pixel location
         """
@@ -195,7 +182,7 @@ class environment:
     
 
 if __name__ == "__main__":
-    _map_viz = environment(250, 600, 10)
+    _map_viz = environment(200, 600, 10)
     _map_viz.create_map()
     _map_viz.refresh_map()
     cv.waitKey(0)
