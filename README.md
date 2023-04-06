@@ -51,9 +51,9 @@
 
 
 ## Obstacle Space - Map:
-- Adobe Photoshop generated:
-  
-![Canvas](https://user-images.githubusercontent.com/78305300/226239170-55cbf178-080e-4550-a2e5-8734c773b690.png)
+- Adobe Photoshop generated:  
+
+![Obstacle_Space_Map](https://user-images.githubusercontent.com/112987383/230250741-1ed85db1-178c-4c36-87fe-f6015a5a2674.png)
 
 - Desmos Visualization:
    
