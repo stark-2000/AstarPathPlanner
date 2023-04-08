@@ -1,4 +1,4 @@
-# Implementation-of-A*-Path-Planning-Algorithm
+# Implementation-of-A*-Path-Planning-Algorithm using TurtleBot Gazebo ROS2
 
 ## Team Members:
 - Tej (119197066 - itej89)
@@ -7,19 +7,20 @@
 
 ## Google Drive Link:
 - Below link has the Animation Video output:
-    - https://drive.google.com/file/d/1Xx3JgBlFZ-htePhxba8Yi7xv2LvUGVkv/view
+    - Part01: https://drive.google.com/file/d/1BFqM_ZlW0QAr9SYCJtw362kum45erf2Z/view?usp=share_link 
+    - Part02: https://drive.google.com/file/d/13a0W3pZDtqHQqK6NQ6CZKaSkKELC-JiH/view?usp=share_link 
 
 ## Github Link:
-- https://github.com/stark-2000/AstarPathPlanner
+- https://github.com/stark-2000/AstarPathPlanner/tree/AStar_Turtlebot3
+
 
 ## Instructions:
 - Clone the repository to your local machine using the following command:
     ``` 
-    git clone https://github.com/stark-2000/AstarPathPlanner.git
+    git clone -b AStar_Turtlebot3 https://github.com/stark-2000/AstarPathPlanner.git
     ```
-    cd into the cloned repository
     ```
-    cd AstarPathPlanner
+    cd <path_to_downloaded repo>/AstarPathPlanner
     ```
 
 - Alternatively, you can download the zip file of the repository and extract it to your local machine:
@@ -27,48 +28,117 @@
     cd AstarPathPlanner-master
     ```
 
-- Open Terminal and Run the following commands & test with the following test cases: (make sure visulization.py file is in the same folder)
-    ```
-    python3 a_star_arshad_dhinesh_tej.py
-    ```
-- Now for Test Case 1, Enter the following values when prompted or any random values of your choice:
-    - Enter Radius of the robot as "5"
-    - Enter the clearance as "5"
-    - Enter step size for robot movement as "5"
-    - Enter the start node as "30,30,30"
-    - Enter the goal node as "418,120,30"
+- Part1: Open Terminal and Run the following commands 
+    - Note: Ensure your inside the repository folder
+        ```
+        cd Part01
+        python3 planner.py
+        ```
+    - Note: Follow the same syntax & units for input arguments for random test cases
+            - RPM1 & RPM2 are in Revolutions per minute
+            - Clearance is in cm
+            - Start Node & Goal Node is in the format: x,y,theta, where x & y are in cm and theta is in degrees
 
-- Repeat the above step for Test Case 2 with the following values or any random values of your choice:
-    - Enter Radius of the robot as "5"
-    - Enter the clearance as "5"
-    - Enter step size for robot movement as "10"
-    - Enter the start node as "30,30,30"
-    - Enter the goal node as "120,120,30"
+    - When promted for input values, enter any random test cases or the following test cases:
+        - Test Case 1:
+            - start_node = 30,30,30
+            - goal_node = 400,180,30
+            - RPM1 = 50
+            - RPM2 = 100
+            - clearance = 5
+        
+        - Test Case 2:
+            - start_node = 30,30,30
+            - goal_node = 350,160,30
+            - RPM1 = 50
+            - RPM2 = 100
+            - clearance = 50
+
+    
+- Part2: Open Terminal & Run the following commands
+    - Note: Ensure your inside the repository folder
+        ```
+        cd Part02
+        ```
+    - Source the ROS2 environment
+        ```
+        source /opt/ros/galactic/setup.bash
+        ```
+        or
+        ```
+        source <ros_installation_directory>/ros/galactic/setup.bash
+        ```
+    - Build the packages
+        ```
+        colcon build
+        ```
+    - Source the workspace
+        ```
+        source . install/setup.bash
+        ```
+    - Run the launch file with the following arguments:
+        - General Syntax:
+            ```
+            ros2 launch turtlebot_path_planning turtlebot_astar_simulation.launch.py 'start_node:=[]' 'goal_node:=[]' 'RPM1:=' 'RPM2:=' 'clearance:='
+            ```
+
+        - Note: Follow the same syntax & units for input arguments for random test cases
+            - RPM1 & RPM2 are in Revolutions per minute
+            - Clearance is in mm
+            - Start Node & Goal Node are in the format: [x,y,theta], where x & y are in meters and theta is in degrees
+
+        - Test Case 1:
+            - Start Node: [-0.2,-0.7,30.0]
+            - Goal Node: [3.0,0.6,30.0]
+            - RPM1: 50.0
+            - RPM2: 100.0
+            - Clearance: 50.0
+
+            ```
+            ros2 launch turtlebot_path_planning turtlebot_astar_simulation.launch.py 'start_node:=[-0.2,-0.7,30.0]' 'goal_node:=[3.0,0.6,30.0]' 'RPM1:=50.0' 'RPM2:=100.0' 'clearance:=50.0'
+            ```
+        - Test Case 2:
+            - Start Node: [0.0,0.0,30.0]
+            - Goal Node: [1.7,0.5,30.0]
+            - RPM1: 50.0
+            - RPM2: 100.0
+            - Clearance: 50.0
+
+            ```
+            ros2 launch turtlebot_path_planning turtlebot_astar_simulation.launch.py 'start_node:=[0.0,0.0,30.0]' 'goal_node:=[1.7,0.5,30.0]' 'RPM1:=50.0' 'RPM2:=100.0' 'clearance:=50.0'
+            ```
 
 - Note: 
-    - To find the optimal path for goal node placed on the right side of hexagon, it takes approx 6 to 7mins depending on your cpu speed. So, please be patient.
-    - The threshold used for node closeness comparison is 2.5 units (0.5 * radius of robot), so please provide the step size above 2.5 units for finding the path. It changes dynamicallyy based on the radius of the robot provided by user. Make sure the step size is above 0.5 * radius of the robot.
+    - The simulation performs well for both the above test cases. In general it works well for all the test cases except a few. Like the turtlebot is not able to follow the trajectory accurately due to lack of a controller hence, it wobbles and deviates a lot while traversing the waypoints.
+    - As a result sometimes it hits obstacles or the boundary of the map and the simulation stops.
+    - Hence, to verify whether path is generated by A* algorithm, the 2D map is also enabled in the simulation. So that you can cross compare how the robot traverses way points indicated in blue in the 2D map. 
+    - The simuation works for a set of goal points above the circle but only works for very few cases when the goal is below or righ side of the circle. 
 
 
 ## Obstacle Space - Map:
-- Adobe Photoshop generated:  
+- OpenCV 2D Visualization:
 
 ![Obstacle_Space_Map](https://user-images.githubusercontent.com/112987383/230250741-1ed85db1-178c-4c36-87fe-f6015a5a2674.png)
 
-- Desmos Visualization:
-   
-![Canvas_Desmos](https://user-images.githubusercontent.com/78305300/226239180-21341f99-308c-4c84-a3f6-ec63ddbf447d.png)
+- Gazebo 3D Visualization:
+
+
 
 ## Demo Video:
- - Video shows exploration of nodes and finding the goal node for a circular robot given start node, goal node, robot radius and clerance from obstacles. Once the shortest path is found, it is backtracked and visualized using openCV.
+ - Video shows exploration of nodes and finding the goal node for a turtlebot3 burger given start node, goal node, 2 set of RPM, and clerance from obstacles. Robot radius 'r' and  Length between 2 wheels 'L' is obtained from Turtlebot3 datasheet. Once the shortest path is found, it is backtracked and visualized using openCV 2D visualization.
+ - ROS logger info and print commands are utilized in regular intervals to show the processing of the obtained launch arguements  and progress of the A* algorithm.
+ - Once the path is visualized in 2D, the linear & angular velocities are calculated and published to the turtlebot3 burger and the robot is made to follow the path which is visualized in 3D using Gazebo. 
+ - First video shows only the 2D visualization and the second video shows the 2D and 3D visualization of the robot following the path.
+
+ 
    
-https://user-images.githubusercontent.com/78305300/226238687-4ec5a996-c4e9-45fa-b35a-5d853e70b8a6.mp4
+
 
 
 ## Dependencies:
  - Other py file (map creation, visualization script, action generation, node checking)
     - For these various operations, multiple py scripts are created and included in the same repository.
-    - Make sure you are running a_star_tej_arshad_dhinesh.py script from the same folder.
+    - Make sure you are running planner.py script from the same folder for part1. 
 
  - Pyclipper Dependency:
     - Pyclipper is a python wrapper for the C++ library clipper. It is used to perform boolean operations on polygons. It gives us the inflated polygon vertices provided the original vertices of the polygon and the inflation radius.
@@ -125,3 +195,10 @@ https://user-images.githubusercontent.com/78305300/226238687-4ec5a996-c4e9-45fa-
     ```
     sudo pip install matplotlib
     ```
+
+- ROS2 Galactic:
+    - (if req open terminal and run the following commands)
+    ```
+    sudo apt install ros-galactic-desktop
+    ```
+    - Link: https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
