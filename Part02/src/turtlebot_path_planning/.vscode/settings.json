@@ -1,0 +1,20 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/dhinesh/ros2_ws_turtlebot/install/velocity_publisher/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_teleop/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_example/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_msgs/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/dynamixel_sdk_custom_interfaces/lib/python3.8/site-packages",
+        "/opt/ros/galactic/lib/python3.8/site-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/dhinesh/ros2_ws_turtlebot/install/velocity_publisher/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_teleop/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_example/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/turtlebot3_msgs/lib/python3.8/site-packages",
+        "/home/dhinesh/ros2_ws_turtlebot/install/dynamixel_sdk_custom_interfaces/lib/python3.8/site-packages",
+        "/opt/ros/galactic/lib/python3.8/site-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
+}
