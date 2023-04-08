@@ -122,6 +122,7 @@
 
 - Gazebo 3D Visualization:
 
+![Screenshot from 2023-04-08 10-38-59](https://user-images.githubusercontent.com/78305300/230730573-b3d242b9-1a3f-4eff-bd41-194b1bf921b9.png)
 
 
 ## Demo Video:
@@ -130,9 +131,11 @@
  - Once the path is visualized in 2D, the linear & angular velocities are calculated and published to the turtlebot3 burger and the robot is made to follow the path which is visualized in 3D using Gazebo. 
  - First video shows only the 2D visualization and the second video shows the 2D and 3D visualization of the robot following the path.
 
- 
-   
+https://user-images.githubusercontent.com/78305300/230730584-fec7748f-aefd-416a-8d30-cb1a76281950.mp4
 
+
+
+https://user-images.githubusercontent.com/78305300/230730592-d62608f1-ff00-4eb4-8bc0-2c852a7dd4be.mp4
 
 
 ## Dependencies:
